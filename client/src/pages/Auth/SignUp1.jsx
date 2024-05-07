@@ -1,16 +1,21 @@
-
 import { ArrowRight } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
-const ASignUp = () => {
 
+const SignUp = () => {
+
+  const navigate = useNavigate()
   const [email, setEmail] = useState("");
   const [number, setNumber] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
   const collectData = async () => {
+    console.log(email,number,password);
     const errors = {};
     if (!email.trim()) {
       errors.email = "Email is required";
@@ -27,11 +32,10 @@ const ASignUp = () => {
     } else if (password.length < 6) {
       errors.password = "Password must be at least 6 characters";
     }
-    console.warn( email, number, password);
 
     if (Object.keys(errors).length === 0) {
       console.warn( email, number, password);
-      let result = await fetch('http://localhost:8000/api/auth/signup', {
+      let result = await fetch('http://localhost:8000/api/auth/csignup', {
         method: 'post',
         body: JSON.stringify({ email, number, password }),
         headers: {
@@ -41,8 +45,10 @@ const ASignUp = () => {
       result = await result.json();
       console.warn(result);
       localStorage.setItem("user", JSON.stringify(result));
-      if (result) {
-        // navigate('/');
+      if (result.email) {
+        toast.success("Registered successfully!", {
+          onClose: () => navigate('/products')
+        });
       }
     } else {
       setErrors(errors);
@@ -51,6 +57,7 @@ const ASignUp = () => {
 
   return (
     <section>
+      <ToastContainer />
       <div className="flex items-center justify-center px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-24 h-full">
         <div className="xl:mx-auto xl:w-full xl:max-w-sm 2xl:max-w-md overflow-auto">
           <h2 className="text-center text-2xl font-bold leading-tight text-black">
@@ -68,8 +75,6 @@ const ASignUp = () => {
           </p>
           <form action="#" method="POST" className="mt-8">
             <div className="space-y-5">
-              <div>
-              </div>
               <div>
               <div className="flex items-center justify-between">
                 <label htmlFor="email" className="text-base font-medium text-gray-900">
@@ -89,7 +94,6 @@ const ASignUp = () => {
                   {errors.email && <p className="text-red-500">{errors.email}</p>}
                 </div>
               </div>
-              
               <div>
               <div className="flex items-center justify-between">
                 <label htmlFor="contact" className="text-base font-medium text-gray-900">
@@ -109,7 +113,7 @@ const ASignUp = () => {
                   {errors.number && <p className="text-red-500">{errors.number}</p>}
                 </div>
               </div>
-              <div> 
+              <div>
                 <div className="flex items-center justify-between">
                   <label htmlFor="password" className="text-base font-medium text-gray-900">
                     {' '}
@@ -144,4 +148,4 @@ const ASignUp = () => {
     </section>
   );
 };
-export default ASignUp;
+export default SignUp;
